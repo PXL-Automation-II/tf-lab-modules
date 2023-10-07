@@ -1,3 +1,4 @@
+# extra comment for v0.0.2
 
 ############################################################################
 # backend config has no place in a module
