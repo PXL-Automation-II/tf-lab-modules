@@ -1,3 +1,5 @@
+# extra comment for v0.0.4
+
 ############################################################################
 # A reusable module has no provider block and no backend block:
 # the root module that calls it configures both.
