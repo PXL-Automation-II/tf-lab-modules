@@ -11,12 +11,13 @@ Versions:
 - `v0.1.0`: `webserver-cluster` and `mysql`, as built in the modules workshop.
 - `v0.2.0`: `webserver-cluster` gets the optional input `server_text`, the text on the web page.
 - `v1.0.0`: for the Terragrunt workshop. `webserver-cluster` takes the inputs `db_address` and `db_port` instead of reading the database state, and `asg-schedule` is new. Callers of `v0.2.0` must change their inputs, so this is a major version.
+- `v0.1.1`, `v0.2.1` and `v1.0.1`: patch releases of the three versions above. `webserver-cluster` looks up the newest Ubuntu 24.04 image with a `data "aws_ami"` block instead of a hard-coded AMI ID. Use these.
 
 Use a module with a Git URL and a tag:
 
 ```hcl
 module "webserver_cluster" {
-  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.2.0"
+  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.2.1"
   # (inputs)
 }
 ```
