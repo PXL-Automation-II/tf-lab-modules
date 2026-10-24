@@ -1,20 +1,22 @@
 # tf-lab-modules
 
-Reusable modules for the PXL [Terraform modules workshop](https://pxl-automation-ii.github.io/terraform-course/#/52-modules-workshop-en).
+Reusable modules for the PXL [Terraform modules workshop](https://pxl-automation-ii.github.io/terraform-course/#/52-modules-workshop-en) and [Terragrunt workshop](https://pxl-automation-ii.github.io/terraform-course/#/57-terragrunt-workshop).
 
 - `services/webserver-cluster`: a load balancer, an Auto Scaling Group and their security groups.
+- `services/asg-schedule`: two scheduled actions that scale an Auto Scaling Group up at 9:00 and down at 17:00. From `v1.0.0`.
 - `data-storage/mysql`: a MySQL database in RDS.
 
 Versions:
 
-- `v0.1.0`: both modules, as built in the workshop.
+- `v0.1.0`: `webserver-cluster` and `mysql`, as built in the modules workshop.
 - `v0.2.0`: `webserver-cluster` gets the optional input `server_text`, the text on the web page.
+- `v1.0.0`: for the Terragrunt workshop. `webserver-cluster` takes the inputs `db_address` and `db_port` instead of reading the database state, and `asg-schedule` is new. Callers of `v0.2.0` must change their inputs, so this is a major version.
 
 Use a module with a Git URL and a tag:
 
 ```hcl
 module "webserver_cluster" {
-  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.1.0"
+  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.2.0"
   # (inputs)
 }
 ```

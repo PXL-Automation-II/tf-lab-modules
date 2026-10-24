@@ -29,16 +29,6 @@ data "aws_subnets" "default" {
   }
 }
 
-data "terraform_remote_state" "db" {
-  backend = "s3"
-
-  config = {
-    bucket = var.db_remote_state_bucket
-    key    = var.db_remote_state_key
-    region = "us-east-1"
-  }
-}
-
 ############################################################################
 # networking
 ############################################################################
@@ -101,8 +91,8 @@ resource "aws_launch_template" "example" {
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
     server_port = var.server_port
     server_text = var.server_text
-    db_address  = data.terraform_remote_state.db.outputs.address
-    db_port     = data.terraform_remote_state.db.outputs.port
+    db_address  = var.db_address
+    db_port     = var.db_port
   }))
 
   vpc_security_group_ids = [aws_security_group.instance.id]
