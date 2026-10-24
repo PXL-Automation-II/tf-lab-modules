@@ -33,3 +33,9 @@ variable "max_size" {
   description = "The maximum number of EC2 instances in the ASG"
   type        = number
 }
+
+variable "server_text" {
+  description = "The text the web server returns"
+  type        = string
+  default     = "Hello, World"
+}

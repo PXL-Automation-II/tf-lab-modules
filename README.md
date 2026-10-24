@@ -8,6 +8,7 @@ Reusable modules for the PXL [Terraform modules workshop](https://pxl-automation
 Versions:
 
 - `v0.1.0`: both modules, as built in the workshop.
+- `v0.2.0`: `webserver-cluster` gets the optional input `server_text`, the text on the web page.
 
 Use a module with a Git URL and a tag:
 
