@@ -1,20 +1,17 @@
-# extra comment for v0.0.4
-
-############################################################################
-# A reusable module has no provider block and no backend block:
-# the root module that calls it configures both.
-############################################################################
-
-############################################################################
-# local variables "locals"
-############################################################################
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 6.0"
+    }
+  }
+}
 
 locals {
   http_port    = 80
-  any_port     = 0
   any_protocol = "-1"
   tcp_protocol = "tcp"
-  all_ips      = ["0.0.0.0/0"]
+  all_ips      = "0.0.0.0/0"
 }
 
 ############################################################################
@@ -43,60 +40,58 @@ data "terraform_remote_state" "db" {
 }
 
 ############################################################################
-# resources
-############################################################################
-
 # networking
 ############################################################################
 
 resource "aws_security_group" "instance" {
   name = "${var.cluster_name}-instance"
+}
 
-  ingress {
-    from_port   = var.server_port
-    to_port     = var.server_port
-    protocol    = local.tcp_protocol
-    cidr_blocks = local.all_ips
-  }
+resource "aws_vpc_security_group_ingress_rule" "instance_http_inbound" {
+  security_group_id = aws_security_group.instance.id
 
-  # outbound access, so user data can install busybox with apt-get
-  egress {
-    from_port   = local.any_port
-    to_port     = local.any_port
-    protocol    = local.any_protocol
-    cidr_blocks = local.all_ips
-  }
+  from_port   = var.server_port
+  to_port     = var.server_port
+  ip_protocol = local.tcp_protocol
+  cidr_ipv4   = local.all_ips
+}
+
+resource "aws_vpc_security_group_egress_rule" "instance_all_outbound" {
+  security_group_id = aws_security_group.instance.id
+
+  ip_protocol = local.any_protocol
+  cidr_ipv4   = local.all_ips
 }
 
 resource "aws_security_group" "alb" {
   name = "${var.cluster_name}-alb"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_http_inbound" {
+resource "aws_vpc_security_group_ingress_rule" "alb_http_inbound" {
   security_group_id = aws_security_group.alb.id
 
   from_port   = local.http_port
   to_port     = local.http_port
   ip_protocol = local.tcp_protocol
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = local.all_ips
 }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
+resource "aws_vpc_security_group_egress_rule" "alb_all_outbound" {
   security_group_id = aws_security_group.alb.id
 
-  ip_protocol = "-1"
-  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = local.any_protocol
+  cidr_ipv4   = local.all_ips
 }
 
+############################################################################
 # instances
 ############################################################################
 
 resource "aws_launch_template" "example" {
-  name = "${var.cluster_name}-lt"
+  name = var.cluster_name
 
   image_id      = "ami-025d99823a4caad37"
   instance_type = var.instance_type
-  key_name      = "vockey" # AWS Academy Learner Lab key pair (labsuser.pem)
 
   iam_instance_profile {
     name = "LabInstanceProfile"
@@ -112,9 +107,6 @@ resource "aws_launch_template" "example" {
   vpc_security_group_ids = [aws_security_group.instance.id]
 }
 
-# auto-scaling
-############################################################################
-
 resource "aws_autoscaling_group" "example" {
   launch_template {
     id      = aws_launch_template.example.id
@@ -124,7 +116,7 @@ resource "aws_autoscaling_group" "example" {
   target_group_arns = [aws_lb_target_group.asg.arn]
   health_check_type = "ELB"
 
-  vpc_zone_identifier = data.aws_subnets.default.ids # Let AWS determine which subnets to use
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d"] # specify valid AZs in us-east-1
 
   min_size = var.min_size
   max_size = var.max_size
@@ -136,7 +128,8 @@ resource "aws_autoscaling_group" "example" {
   }
 }
 
-# load-balancer
+############################################################################
+# load balancer
 ############################################################################
 
 resource "aws_lb" "example" {
