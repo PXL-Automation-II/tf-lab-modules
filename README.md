@@ -2,22 +2,27 @@
 
 Reusable modules for the PXL [Terraform modules workshop](https://pxl-automation-ii.github.io/terraform-course/#/52-modules-workshop-en) and [Terragrunt workshop](https://pxl-automation-ii.github.io/terraform-course/#/57-terragrunt-workshop).
 
-- `services/webserver-cluster`: a load balancer, an Auto Scaling Group and their security groups.
-- `services/asg-schedule`: two scheduled actions that scale an Auto Scaling Group up at 9:00 and down at 17:00. From `v1.0.0`.
-- `data-storage/mysql`: a MySQL database in RDS.
+| Module | Contents |
+| --- | --- |
+| `services/webserver-cluster` | A load balancer, an Auto Scaling Group and their security groups. |
+| `services/asg-schedule` | Two scheduled actions that scale an Auto Scaling Group up at 9:00 and down at 17:00. From `v1.0.0`. |
+| `data-storage/mysql` | A MySQL database in RDS. |
 
-Versions:
+The versions:
 
-- `v0.1.0`: `webserver-cluster` and `mysql`, as built in the modules workshop.
-- `v0.2.0`: `webserver-cluster` gets the optional input `server_text`, the text on the web page.
-- `v1.0.0`: for the Terragrunt workshop. `webserver-cluster` takes the inputs `db_address` and `db_port` instead of reading the database state, and `asg-schedule` is new. Callers of `v0.2.0` must change their inputs, so this is a major version.
-- `v0.1.1`, `v0.2.1` and `v1.0.1`: patch releases of the three versions above. `webserver-cluster` looks up the newest Ubuntu 24.04 image with a `data "aws_ami"` block instead of a hard-coded AMI ID. Use these.
+| Version | Changes |
+| --- | --- |
+| `v0.1.0` | `webserver-cluster` and `mysql`, as built in the modules workshop. |
+| `v0.2.0` | `webserver-cluster` gets the optional input `server_text`, the text on the web page. |
+| `v1.0.0` | For the Terragrunt workshop. `webserver-cluster` takes the inputs `db_address` and `db_port` instead of reading the database state, and `asg-schedule` is new. Callers of `v0.2.0` must change their inputs, so this is a major version. |
+| `v0.1.1`, `v0.2.1`, `v1.0.1` | Patch releases of the three versions above. `webserver-cluster` looks up the newest Ubuntu 24.04 image with a `data "aws_ami"` block instead of a hard-coded AMI ID. |
+| `v0.1.2`, `v0.2.2`, `v1.0.2` | The next patch releases. `webserver-cluster` puts its instances in the subnets of the Availability Zones that offer its instance type, instead of a fixed list of `us-east-1a` to `us-east-1d`. Zone names map to other data centers in every AWS account, so a fixed list can contain a zone without the instance type. Use these. |
 
 Use a module with a Git URL and a tag:
 
 ```hcl
 module "webserver_cluster" {
-  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.2.1"
+  source = "github.com/PXL-Automation-II/tf-lab-modules//services/webserver-cluster?ref=v0.2.2"
   # (inputs)
 }
 ```
